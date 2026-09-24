@@ -19,6 +19,7 @@ const batchMembers = [
   { name: "Nikhil", role: "Technical Head", image: "/Batch25-29/nikhil.jpeg", github: "https://github.com/nikhilkumar95f", link: "https://www.linkedin.com/in/nikhil-kumar-0n7" },
   { name: "Kavyansh", role: "Lead Organizer", image: "/Batch25-29/kavyansh.jpeg", github: "https://github.com/kavyanshsharma423-beep", link: "https://www.linkedin.com/in/kavyansh-sharma-6a6bb9381/" },
   { name: "Mungesh", role: "Operations & Execution Lead", image: "/Batch25-29/mungesh.jpeg", github: "https://github.com/mungesh2006", link: "https://www.linkedin.com/in/mungesh-jaiswal-54a7b2381" },
+  { name: "Abhishek singh", role: "Media head", image: "/Batch25-29/Abhishek.jpeg", github:"https://github.com/abhisheksingh831895-dev", link: "https://www.linkedin.com/in/abhishek-singh-b69001382/"}
 ];
 
 function MemberPortrait({ member }) {
