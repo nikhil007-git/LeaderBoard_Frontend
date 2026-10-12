@@ -1,5 +1,6 @@
-﻿import { Glitch, Counter } from "./LeaderboardHelpers";
+import { Glitch, Counter } from "./LeaderboardHelpers";
 import UserLeaderboardPodium from "./UserLeaderboardPodium";
+import { ZapIcon } from "./Icons";
 
 export default function UserLeaderboardHero({
   showWelcome,
@@ -36,12 +37,16 @@ export default function UserLeaderboardHero({
               <Glitch style={{ color: "#00ffcc", textShadow: "0 0 30px #00ffcc88, 0 0 80px #00ffcc22" }}>IGNITE CLUB</Glitch>
             </h1>
             <h2 style={{ fontFamily: "'VT323',monospace", fontSize: "clamp(22px,5vw,42px)", color: "#00aaff", textShadow: "0 0 20px #00aaff77", marginBottom: 10, letterSpacing: "0.1em" }}>
-              CodeCraft 2026 🎉
+              CodeCraft 2026
             </h2>
             <p style={{ color: "rgba(0,255,160,0.22)", fontSize: 9, letterSpacing: "0.3em", marginBottom: 52, fontFamily: "'Share Tech Mono',monospace" }}>
               VISHVESHWARYA GROUP OF INSTITUTION
             </p>
-            <button className="enter-btn" onClick={handleEnter}><span>⚡ BREACH SYSTEM</span></button>
+            <button className="enter-btn" onClick={handleEnter}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <ZapIcon size={16} /> BREACH SYSTEM
+              </span>
+            </button>
           </div>
         </div>
       )}

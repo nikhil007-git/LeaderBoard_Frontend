@@ -156,10 +156,10 @@ export function computeGameData(sorted) {
   sorted.forEach(s => {
     const b = [];
     const d = deltas[s.roll];
-    if (s.rank <= 3) b.push({ icon: "👑", label: "TOP 3" });
-    if (d.hadPrev && d.delta > 0) b.push({ icon: "🔥", label: "RISING" });
-    if (s.roll === topClimber && topDelta > 0) b.push({ icon: "⚡", label: "CLIMBER" });
-    if (!d.hadPrev) b.push({ icon: "🆕", label: "ROOKIE" });
+    if (s.rank <= 3) b.push({ type: "top3", label: "TOP 3" });
+    if (d.hadPrev && d.delta > 0) b.push({ type: "rising", label: "RISING" });
+    if (s.roll === topClimber && topDelta > 0) b.push({ type: "climber", label: "CLIMBER" });
+    if (!d.hadPrev) b.push({ type: "rookie", label: "ROOKIE" });
     badges[s.roll] = b;
   });
 

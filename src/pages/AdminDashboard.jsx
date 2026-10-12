@@ -123,6 +123,7 @@ export default function AdminDashboard() {
 
   const handleLogout = () => {
     sessionStorage.removeItem("adminAuth");
+    sessionStorage.removeItem("adminToken");
     setIsAuthenticated(false);
   };
 

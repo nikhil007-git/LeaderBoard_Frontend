@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { api } from "../services/api";
 import UserLeaderboardHero from "../components/UserLeaderboardHero";
 import UserLeaderboardPodium from "../components/UserLeaderboardPodium";
@@ -8,6 +8,7 @@ import ProfileCard from "../components/ProfileCard";
 import { SpaceCanvas, MatrixRain } from "../components/LeaderboardEffects";
 import { useScrollReveal, computeGameData } from "../components/LeaderboardHelpers";
 import LeaderboardNav from "../components/LeaderboardNav";
+import { playWelcomeVoice } from "../utils/voice";
 
 function LeaderboardSkeleton() {
   return (
@@ -33,6 +34,7 @@ export default function UserLeaderboard() {
   const [badges, setBadges] = useState({});
   const [rankDeltas, setRankDeltas] = useState({});
   const [profileTarget, setProfileTarget] = useState(null);
+  const [profilePinned, setProfilePinned] = useState(false);
   const [copied, setCopied] = useState("");
   const [typeText, setTypeText] = useState("");
   const [sortBy, setSortBy] = useState("rank");
@@ -40,8 +42,22 @@ export default function UserLeaderboard() {
   const [isLoading, setIsLoading] = useState(true);
   const podiumRef = useRef(null);
 
-  const handleProfileClose = () => setProfileTarget(null);
-  const handleProfileOpen = (student, pos) => setProfileTarget({ student, pos, badges: badges[student.roll] || [] });
+  const handleProfileClose = () => {
+    setProfileTarget(null);
+    setProfilePinned(false);
+  };
+  const handleProfileHover = (student, pos) => {
+    if (profilePinned) return;
+    setProfileTarget({ student, pos, badges: badges[student.roll] || [] });
+  };
+  const handleProfileLeave = () => {
+    if (profilePinned) return;
+    setProfileTarget(null);
+  };
+  const handleProfileSelect = (student, pos) => {
+    setProfilePinned(true);
+    setProfileTarget({ student, pos, badges: badges[student.roll] || [] });
+  };
   const [statsRef, statsVisible] = useScrollReveal(0.1);
   const fullText = "> ACCESSING IGNITE_CLUB.DB... [OK]\n> DECRYPTING CodeCraft RANKINGS... [OK]\n> NEURAL LINK ESTABLISHED......... [GO]";
 
@@ -90,12 +106,13 @@ export default function UserLeaderboard() {
   }, [data]);
 
   const handleEnter = () => {
+    playWelcomeVoice();
     setExiting(true);
     setTimeout(() => setShowWelcome(false), 720);
   };
 
   const shareRank = async item => {
-    const text = `I'm #${item.rank} on BugByte 2026 Leaderboard with ${item.points} XP! 🔥 ${window.location.href}`;
+    const text = `I'm #${item.rank} on CodeCraft Leaderboard with ${item.points} XP! ${window.location.href}`;
     try {
       if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
       await navigator.clipboard.writeText(text);
@@ -116,7 +133,7 @@ export default function UserLeaderboard() {
     return a.rank - b.rank;
   });
   const filtered = showTopOnly ? sortedResults.slice(0, 10) : sortedResults;
-  const medal = r => r === 1 ? "🥇" : r === 2 ? "🥈" : r === 3 ? "🥉" : null;
+  const medal = r => (r <= 3 ? r : null);
   const highestPts = sorted.length
     ? sorted.reduce((highest, student) => Math.max(highest, Number(student.points) || 0), Number.NEGATIVE_INFINITY)
     : 0;
@@ -134,9 +151,9 @@ export default function UserLeaderboard() {
         .lb::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;background:linear-gradient(rgba(0,255,200,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,170,255,0.02) 1px,transparent 1px);background-size:64px 64px;mask-image:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent 72%)}
         .lb::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(circle at 50% 0%,rgba(0,126,167,0.16),transparent 36%),radial-gradient(circle at 88% 72%,rgba(0,255,160,0.06),transparent 24%)}
 
-        .wl{position:fixed;inset:0;z-index:200;background:#000308;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.7s,transform 0.7s cubic-bezier(0.4,0,0.2,1)}
+        .wl{position:fixed;inset:0;z-index:200;background:#000308;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.7s,transform 0.7s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;padding:24px 16px;-webkit-overflow-scrolling:touch}
         .wl.exit{opacity:0;transform:scale(1.1) rotateX(10deg);pointer-events:none}
-        .wl-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00ffcc,#00aaff,transparent);animation:scan 2.5s linear infinite}
+        .wl-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00ffcc,#00aaff,transparent);animation:scan 2.5s linear infinite;pointer-events:none}
         @keyframes scan{from{top:-2px}to{top:100%}}
         .corner{position:absolute;width:28px;height:28px;border-color:#00ffcc44;border-style:solid;animation:cPulse 2s ease-in-out infinite}
         .corner.tl{top:18px;left:18px;border-width:2px 0 0 2px}
@@ -317,28 +334,34 @@ export default function UserLeaderboard() {
         .footer-socials a:hover{background:rgba(0,255,160,0.08);border-color:rgba(0,255,160,0.4);color:#00ffcc}
 
         @media(max-width:640px){
-          .leader-nav{top:8px;margin:0 12px;padding:9px 12px}
-          .leader-menu-button{display:block}
-          .leader-nav-links{position:absolute;top:calc(100% + 8px);left:0;right:0;display:none;flex-direction:column;align-items:stretch;gap:0;padding:8px;background:rgba(3,12,23,0.96);border:1px solid rgba(0,255,200,0.18);box-shadow:0 16px 30px rgba(0,0,0,0.35)}
+          .leader-nav{top:6px;margin:0 8px;padding:8px 12px;border-radius:4px}
+          .leader-brand strong{font-size:11px}
+          .leader-brand small{font-size:7px}
+          .leader-brand-mark{width:26px;height:26px;font-size:14px}
+          .leader-menu-button{display:flex;align-items:center;justify-content:center;flex-direction:column;width:34px;height:34px;padding:6px;border-radius:3px}
+          .leader-menu-button span{width:18px;height:2px;margin:2px 0;border-radius:1px}
+          .leader-nav-links{position:absolute;top:calc(100% + 6px);left:0;right:0;display:none;flex-direction:column;align-items:stretch;gap:0;padding:6px;background:rgba(3,12,23,0.98);border:1px solid rgba(0,255,200,0.22);border-radius:4px;box-shadow:0 16px 36px rgba(0,0,0,0.5)}
           .leader-nav-links.is-open{display:flex}
-          .leader-nav-links a{padding:13px 10px;border-bottom:1px solid rgba(0,255,200,0.08)}
-          .lb-inner{padding-left:16px;padding-right:16px}
-          .hero-eyebrow{letter-spacing:0.16em;line-height:1.6}
-          .hero-title{letter-spacing:0.02em}
-          /* .hero-description{padding:0 12px}
-          .stats-bar{gap:0;justify-content:space-around;padding:13px 6px}
-          .stat-cell{min-width:0;flex:1;padding:4px 6px}
-          .stat-cell-highlight{border-left:1px solid rgba(0,255,200,0.12);border-right:1px solid rgba(0,255,200,0.12)}
-          .stats-heading{font-size:8px;letter-spacing:0.14em}
-          .stat-v{font-size:21px}
-          .stat-l{font-size:7px;letter-spacing:0.12em}
-          .stat-sep{margin:0 8px} */
-          .leaderboard-tools{display:grid;grid-template-columns:1fr 1fr;width:100%}
-          .sort-control{min-width:0;justify-content:space-between;grid-column:1 / -1}
-          .sort-select{flex:1;min-width:0}
-          .top-toggle{width:100%}
-          .rankings-heading{align-items:flex-start;flex-direction:column;margin-bottom:16px}
+          .leader-nav-links a{padding:12px 10px;font-size:11px;border-bottom:1px solid rgba(0,255,200,0.08)}
+          .lb-inner{padding-left:12px;padding-right:12px}
+          .hero-eyebrow{letter-spacing:0.14em;line-height:1.5;font-size:8px;margin-bottom:10px}
+          .hero-title{font-size:clamp(26px,7vw,42px);letter-spacing:0.02em;line-height:1.1;margin-bottom:6px}
+          .hero-subtitle{font-size:16px;letter-spacing:0.08em;margin-bottom:8px}
+          .typewriter{font-size:10px;line-height:1.6;margin-bottom:24px;min-height:auto;white-space:pre-wrap;word-break:break-word}
+          .enter-btn{width:100%;max-width:280px;padding:14px 20px;font-size:12px;letter-spacing:0.16em}
+          .corner{width:18px;height:18px}
+          .corner.tl{top:10px;left:10px}
+          .corner.tr{top:10px;right:10px}
+          .corner.bl{bottom:10px;left:10px}
+          .corner.br{bottom:10px;right:10px}
+          .leaderboard-tools{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:8px;margin-bottom:14px}
+          .sort-control{min-width:0;justify-content:space-between;grid-column:1 / -1;padding:6px 10px}
+          .sort-select{flex:1;min-width:0;padding:6px 8px;font-size:11px}
+          .top-toggle{width:100%;min-height:38px;padding:8px 12px;font-size:11px}
+          .rankings-heading{align-items:flex-start;flex-direction:column;margin-bottom:14px;gap:6px}
           .rankings-heading p{text-align:left}
+          .card-wrap{border-radius:4px}
+          .founder-link{width:26px;height:26px;font-size:14px}
         }
 
         ::-webkit-scrollbar{width:4px}
@@ -347,7 +370,7 @@ export default function UserLeaderboard() {
         ::-webkit-scrollbar-thumb:hover{background:rgba(0,255,160,0.4)}
       `}</style>
 
-      <div id="top" className="lb" onMouseLeave={() => setProfileTarget(null)} onPointerDown={handleProfileClose}>
+      <div id="top" className="lb">
         <SpaceCanvas />
         <MatrixRain />
         {/* <CursorTrail /> */}
@@ -412,9 +435,9 @@ export default function UserLeaderboard() {
                       badges={badges[item.roll] || []}
                       rankDeltas={rankDeltas}
                       rankTrigger={rankTrigger}
-                      onNameHover={(student, pos) => handleProfileOpen(student, pos)}
-                      onNameLeave={handleProfileClose}
-                      onNameSelect={(student, pos) => handleProfileOpen(student, pos)}
+                      onNameHover={handleProfileHover}
+                      onNameLeave={handleProfileLeave}
+                      onNameSelect={handleProfileSelect}
                       onShare={shareRank}
                       copied={copied}
                     />
@@ -436,7 +459,7 @@ export default function UserLeaderboard() {
               <MobileCard
                 key={item._id}
                 item={item}
-                onNameSelect={(student, pos) => handleProfileOpen(student, pos)}
+                onNameSelect={handleProfileSelect}
                 index={i}
                 medal={medal(item.rank)}
                 topScore={sorted[0]?.points || 0}
@@ -457,7 +480,15 @@ export default function UserLeaderboard() {
       )}
         </div>
 
-        {profileTarget && <ProfileCard student={profileTarget.student} badges={profileTarget.badges} pos={profileTarget.pos} onClose={handleProfileClose} />}
+        {profileTarget && (
+          <ProfileCard
+            student={profileTarget.student}
+            badges={profileTarget.badges}
+            pos={profileTarget.pos}
+            onClose={handleProfileClose}
+            theme="cyan"
+          />
+        )}
 
         <UserLeaderboardFooter sorted={sorted} top3={top3} totalPts={totalPts} podiumRef={podiumRef} />
       </div>
