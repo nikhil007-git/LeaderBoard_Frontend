@@ -15,7 +15,9 @@ const foundingMembers = [
 
 const batchMembers = [
   { name: "Anupam", role: "President", image: "/Batch25-29/anupam.jpeg", github: "https://github.com/anupamguptaji123-droid", link: "https://www.linkedin.com/in/anupam-kumari-8167aa3a8" },
-  { name: "Nikhil", role: "Technical Head", image: "/Batch25-29/nikhil.jpeg", github: "https://github.com/nikhilkumar95f", link: "https://www.linkedin.com/in/nikhil-kumar-0n7" },
+  { name: "Shayef Kabir", role: "Vice President", image: "/Batch25-29/shayef.jpeg", github: "https://github.com/shayefkabir2005", link: "https://www.linkedin.com/in/shayef-kabir-b853b0372/" },
+  { name: "Nikhil", role: "Technical Head", image: "/Batch25-29/nikhil.jpeg", github: "https://github.com/nikhil007-git", link: "https://www.linkedin.com/in/nikhil-kumar-0n7" },
+  { name: "Parth Gupta", role: "Chief Adviser", image: "/Batch25-29/parth.jpeg", link: "https://www.linkedin.com/in/guptaparth4059u/" },
   { name: "Kavyansh", role: "Lead Organizer", image: "/Batch25-29/kavyansh.jpeg", github: "https://github.com/kavyanshsharma423-beep", link: "https://www.linkedin.com/in/kavyansh-sharma-6a6bb9381/" },
   { name: "Mungesh", role: "Operations & Execution Lead", image: "/Batch25-29/mungesh.jpeg", github: "https://github.com/mungesh2006", link: "https://www.linkedin.com/in/mungesh-jaiswal-54a7b2381" },
   { name: "Abhishek singh", role: "Media head", image: "/Batch25-29/Abhishek.jpeg", github: "https://github.com/abhisheksingh831895-dev", link: "https://www.linkedin.com/in/abhishek-singh-b69001382/" }
